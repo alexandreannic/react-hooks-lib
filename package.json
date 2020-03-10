@@ -1,0 +1,18 @@
+{
+  "name": "@alexandreannic/react-hooks-lib",
+  "version": "1.0.0",
+  "description": "Bunch of react hooks",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "alexandre.annic1@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^16.8.6"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.23",
+    "typescript": "^3.8.3"
+  }
+}
