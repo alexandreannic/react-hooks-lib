@@ -37,35 +37,15 @@ export interface Delete<T> {
   remove: DeleteAction
 }
 
-export interface CrudListR<E extends Entity> extends Read<E> {
-}
-
-export interface CrudListRD<E extends Entity> extends Read<E>, Delete<E> {
-}
-
-export interface CrudListCRD<E extends Entity> extends Create<E>, Read<E>, Delete<E> {
-}
-
-export interface CrudListCRUD<E extends Entity> extends Create<E>, Read<E>, Delete<E>, Update<E> {
-}
-
-export interface CrudListCR<E extends Entity> extends Create<E>, Read<E> {
-}
-
-export interface CrudListR<E extends Entity> extends Read<E> {
-}
-
-export interface CrudListC<E extends Entity> extends Create<E> {
-}
-
-export interface CrudListD<E extends Entity> extends Delete<E> {
-}
-
-export interface CrudListCUD<E extends Entity> extends Create<E>, Delete<E>, Update<E> {
-}
-
-export interface CrudListCD<E extends Entity> extends Create<E>, Delete<E> {
-}
+export type CrudListR<E extends Entity> = Read<E>;
+export type CrudListRD<E extends Entity> = Read<E> & Delete<E>;
+export type CrudListCRD<E extends Entity> = Create<E> & Read<E> & Delete<E>;
+export type CrudListCRUD<E extends Entity> = Create<E> & Read<E> & Delete<E> & Update<E>;
+export type CrudListCR<E extends Entity> = Create<E> & Read<E>;
+export type CrudListC<E extends Entity> = Create<E>;
+export type CrudListD<E extends Entity> = Delete<E>;
+export type CrudListCUD<E extends Entity> = Create<E> & Delete<E> & Update<E>;
+export type CrudListCD<E extends Entity> = Create<E> & Delete<E>;
 
 export interface UseCrudList {
   <E extends Entity>(_: {r: ReadAction<E[]>}): CrudListR<E>

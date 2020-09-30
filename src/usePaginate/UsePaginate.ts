@@ -35,12 +35,12 @@ export const usePaginate = <T, S extends ISearch>(
   return {
     list,
     fetching,
-    fetch: (force?: boolean, clean?: boolean) => fetch(force, clean)(filters),
+    fetch: (args: {force?: boolean, clean?: boolean}) => fetch(args)(filters),
     filters,
     setFilters: (filters: S, refetch = true) => {
       setFilters({...defaultFilters, ...filters});
       if (refetch) {
-        fetch(true, false)(filters);
+        fetch({force: true, clean: false})(filters);
       }
     },
   };

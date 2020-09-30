@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction, useRef, useState} from 'react';
 
-export type Fetch<T> = (force?: boolean, clean?: boolean) => T;
+export type Fetch<T> = (args: {force?: boolean, clean?: boolean}) => T;
 
 export type UseFetchableReturn<T> = [
   T | undefined,
@@ -23,7 +23,7 @@ export const useFetcher = <T>(
   const [loading, setLoading] = useState<boolean>(false);
   const fetch$ = useRef<Promise<T>>();
 
-  const fetch = (force: boolean = true, clean: boolean = true) => (...args: any[]): Promise<T> => {
+  const fetch = ({force = true, clean = true}: {force?: boolean, clean?: boolean}) => (...args: any[]): Promise<T> => {
     if (fetch$.current) {
       return fetch$.current!;
     }
