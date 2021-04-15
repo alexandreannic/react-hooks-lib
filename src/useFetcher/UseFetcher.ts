@@ -23,7 +23,7 @@ export const useFetcher = <T>(
   const [loading, setLoading] = useState<boolean>(false);
   const fetch$ = useRef<Promise<T>>();
 
-  const fetch = ({force = true, clean = true}: {force?: boolean, clean?: boolean}) => (...args: any[]): Promise<T> => {
+  const fetch = ({force = true, clean = true}: {force?: boolean, clean?: boolean} = {}) => (...args: any[]): Promise<T> => {
     if (fetch$.current) {
       return fetch$.current!;
     }
