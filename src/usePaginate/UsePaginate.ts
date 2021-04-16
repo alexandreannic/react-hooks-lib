@@ -1,5 +1,5 @@
-import {Fetch, useFetcher} from '../useFetcher/UseFetcher';
-import {useState} from 'react';
+import {Fetch, useFetcher} from '../useFetcher/UseFetcher'
+import {useState} from 'react'
 
 export interface Paginate<T> {
   data: T[]
@@ -23,25 +23,25 @@ export interface UsePaginate<T, S> {
   setFilters: (s: S) => void,
 }
 
-const defaultFilters: ISearch = {offset: 0, limit: 10,};
+const defaultFilters: ISearch = {offset: 0, limit: 10,}
 
 export const usePaginate = <T, S extends ISearch>(
   fetcher: (search: S) => Promise<Paginate<T>>,
   initialFilters?: S,
 ): UsePaginate<T, S> => {
-  const [filters, setFilters] = useState<S>({...defaultFilters, ...(initialFilters || {}) as any});
-  const [list, fetching, fetch, set, clearCache] = useFetcher<Paginate<T>>(fetcher);
+  const [filters, setFilters] = useState<S>({...defaultFilters, ...(initialFilters || {}) as any})
+  const [list, fetching, fetch, set, clearCache] = useFetcher<Paginate<T>>(fetcher)
 
   return {
     list,
     fetching,
-    fetch: (args: {force?: boolean, clean?: boolean}) => fetch(args)(filters),
+    fetch: (args: {force?: boolean, clean?: boolean} = {}) => fetch(args)(filters),
     filters,
     setFilters: (filters: S, refetch = true) => {
-      setFilters({...defaultFilters, ...filters});
+      setFilters({...defaultFilters, ...filters})
       if (refetch) {
-        fetch({force: true, clean: false})(filters);
+        fetch({force: true, clean: false})(filters)
       }
     },
-  };
-};
+  }
+}

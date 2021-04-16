@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useState} from 'react';
+import {Dispatch, SetStateAction, useState} from 'react'
 
 export type UseToggle = [
   boolean,
@@ -9,6 +9,6 @@ export type UseToggle = [
 ]
 
 export const useBoolean = (value: boolean = false): UseToggle => {
-  const [b, setB] = useState(value);
-  return [b, () => setB(true), () => setB(false), () => setB(b => !b), setB];
-};
+  const [b, setB] = useState(value)
+  return [b, () => setB(true), () => setB(false), () => setB(b => !b), setB]
+}

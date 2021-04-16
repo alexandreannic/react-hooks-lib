@@ -1,6 +1,6 @@
-import {Fetch, useFetcher} from '../useFetcher/UseFetcher';
-import {useState} from 'react';
-import {useSetState} from '../useSetState/UseSetState';
+import {Fetch, useFetcher} from '../useFetcher/UseFetcher'
+import {useState} from 'react'
+import {useSetState} from '../useSetState/UseSetState'
 
 export type Id = string;
 
@@ -67,60 +67,60 @@ interface UseCrudParams<E> {
 }
 
 export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrudParams<E>) => {
-  const [creating, setCreating] = useState(false);
-  const [list, fetching, fetch, set, clearCache] = useFetcher<E[]>(r!);
-  const [removingList, addRemoving, removeRemoving] = useSetState<Id>();
-  const [updatingList, addUpdating, removeUpdating] = useSetState<Id>();
+  const [creating, setCreating] = useState(false)
+  const [list, fetching, fetch, set, clearCache] = useFetcher<E[]>(r!)
+  const [removingList, addRemoving, removeRemoving] = useSetState<Id>()
+  const [updatingList, addUpdating, removeUpdating] = useSetState<Id>()
 
   const create = async (...args: any[]): Promise<E> => {
     try {
-      setCreating(true);
-      const entity = await c!(...args);
+      setCreating(true)
+      const entity = await c!(...args)
       if (r) {
-        set([...(list || []), entity]);
+        set([...(list || []), entity])
       }
-      setCreating(false);
-      return entity;
+      setCreating(false)
+      return entity
     } catch (e) {
-      setCreating(false);
-      throw e;
+      setCreating(false)
+      throw e
     }
-  };
+  }
 
   const remove = async (id: Id) => {
     try {
-      addRemoving(id);
-      await d!(id);
+      addRemoving(id)
+      await d!(id)
       if (r) {
-        set(n => n!.filter(x => x.id !== id));
+        set(n => n!.filter(x => x.id !== id))
       }
-      removeRemoving(id);
+      removeRemoving(id)
     } catch (e) {
-      removeRemoving(id);
-      throw e;
+      removeRemoving(id)
+      throw e
     }
-  };
+  }
   const update: UpdateAction<E> = async (id, ...args: any[]) => {
     try {
-      addUpdating(id);
-      const updatedEntity = await u!(id, ...args);
+      addUpdating(id)
+      const updatedEntity = await u!(id, ...args)
       if (r) {
-        set(n => n!.map(x => (x.id === id) ? {...x, ...updatedEntity} : x));
+        set(n => n!.map(x => (x.id === id) ? {...x, ...updatedEntity} : x))
       }
-      return updatedEntity;
+      return updatedEntity
     } finally {
-      removeUpdating(id);
+      removeUpdating(id)
     }
-  };
+  }
 
   const find = (id: Id): E | undefined => {
     if (list) {
-      return list.find(t => t.id === id);
+      return list.find(t => t.id === id)
     }
-  };
+  }
 
-  const removing = (id: Id): boolean => removingList.has(id);
-  const updating = (id: Id): boolean => updatingList.has(id);
+  const removing = (id: Id): boolean => removingList.has(id)
+  const updating = (id: Id): boolean => updatingList.has(id)
 
   return {
     ...(c && {
@@ -142,5 +142,5 @@ export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrud
       updating,
       update: update,
     }),
-  } as any;
-};
+  } as any
+}
