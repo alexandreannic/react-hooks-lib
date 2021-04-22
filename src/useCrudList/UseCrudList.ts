@@ -69,8 +69,8 @@ interface UseCrudParams<E> {
 export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrudParams<E>) => {
   const [creating, setCreating] = useState(false)
   const [list, fetching, fetch, set, clearCache] = useFetcher<E[]>(r!)
-  const [removingList, addRemoving, removeRemoving] = useSetState<Id>()
-  const [updatingList, addUpdating, removeUpdating] = useSetState<Id>()
+  const removeList = useSetState<Id>()
+  const updatingList = useSetState<Id>()
 
   const create = async (...args: any[]): Promise<E> => {
     try {
@@ -89,27 +89,27 @@ export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrud
 
   const remove = async (id: Id) => {
     try {
-      addRemoving(id)
+      removeList.add(id)
       await d!(id)
       if (r) {
         set(n => n!.filter(x => x.id !== id))
       }
-      removeRemoving(id)
+      removeList.delete(id)
     } catch (e) {
-      removeRemoving(id)
+      removeList.delete(id)
       throw e
     }
   }
   const update: UpdateAction<E> = async (id, ...args: any[]) => {
     try {
-      addUpdating(id)
+      updatingList.add(id)
       const updatedEntity = await u!(id, ...args)
       if (r) {
         set(n => n!.map(x => (x.id === id) ? {...x, ...updatedEntity} : x))
       }
       return updatedEntity
     } finally {
-      removeUpdating(id)
+      updatingList.delete(id)
     }
   }
 
@@ -119,7 +119,7 @@ export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrud
     }
   }
 
-  const removing = (id: Id): boolean => removingList.has(id)
+  const removing = (id: Id): boolean => removeList.has(id)
   const updating = (id: Id): boolean => updatingList.has(id)
 
   return {
