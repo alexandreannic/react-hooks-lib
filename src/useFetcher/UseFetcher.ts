@@ -2,24 +2,25 @@ import {Dispatch, SetStateAction, useRef, useState} from 'react'
 
 export type Fetch<T> = (args?: {force?: boolean, clean?: boolean}) => T;
 
-export type UseFetchableReturn<T> = [
-  T | undefined,
-  boolean,
-  Fetch<(...args: any[]) => Promise<T>>,
-  Dispatch<SetStateAction<T | undefined>>,
-  () => void
-];
+export type UseFetchableReturn<T, E = any> = {
+  entity: T | undefined,
+  loading: boolean,
+  error?: E
+  fetch: Fetch<(...args: any[]) => Promise<T>>,
+  setEntity: Dispatch<SetStateAction<T | undefined>>,
+  clearCache: () => void,
+};
 
 /**
  * Factorize fetching logic which goal is to prevent unneeded fetchs and expose loading indicator.
- * @param fetcher
- * @param initialValue
  */
-export const useFetcher = <T>(
+export const useFetcher = <T, E = any>(
   fetcher: (...args: any[]) => Promise<T>,
-  initialValue?: T
-): UseFetchableReturn<T> => {
+  initialValue?: T,
+  mapError: (_: any) => E = _ => _
+): UseFetchableReturn<T, E> => {
   const [entity, setEntity] = useState<T | undefined>(initialValue)
+  const [error, setError] = useState<E | undefined>()
   const [loading, setLoading] = useState<boolean>(false)
   const fetch$ = useRef<Promise<T>>()
 
@@ -31,6 +32,7 @@ export const useFetcher = <T>(
       return Promise.resolve(entity)
     }
     if (clean) {
+      setError(undefined)
       setEntity(undefined)
     }
     setLoading(true)
@@ -44,15 +46,18 @@ export const useFetcher = <T>(
       .catch((e) => {
         setLoading(false)
         fetch$.current = undefined
-        throw e
+        setError(mapError(e))
+        setEntity(undefined)
+        // throw e
       })
     return fetch$.current
   }
 
   const clearCache = () => {
     setEntity(undefined)
+    setError(undefined)
     fetch$.current = undefined
   }
 
-  return [entity, loading, fetch, setEntity, clearCache]
+  return {entity, loading, error, fetch, setEntity, clearCache}
 }

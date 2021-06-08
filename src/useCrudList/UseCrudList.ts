@@ -68,7 +68,7 @@ interface UseCrudParams<E> {
 
 export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrudParams<E>) => {
   const [creating, setCreating] = useState(false)
-  const [list, fetching, fetch, set, clearCache] = useFetcher<E[]>(r!)
+  const {entity: list, loading: fetching, fetch, setEntity: set, clearCache} = useFetcher<E[]>(r!)
   const removeList = useSetState<Id>()
   const updatingList = useSetState<Id>()
 
