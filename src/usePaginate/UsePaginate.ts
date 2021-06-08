@@ -1,5 +1,5 @@
-import {Fetch, useFetcher} from '../useFetcher/UseFetcher';
-import {useState} from 'react';
+import {Fetch, useFetcher} from '..'
+import {SetStateAction, useState} from 'react'
 
 export interface Paginate<T> {
   data: T[]
@@ -15,33 +15,45 @@ export interface ISearch<T = any> {
   sortBy?: keyof T
 }
 
-export interface UsePaginate<T, S> {
+export interface UsePaginate<T, S, E = any> {
   list?: Paginate<T>,
+  error?: E
   fetching: boolean,
   fetch: Fetch<Promise<Paginate<T>>>
   filters: S,
-  setFilters: (s: S) => void,
+  updateFilters: (_: SetStateAction<S>, refetch?: boolean) => void,
+  clearFilters: () => void,
+  pageNumber: number
+  initialFilters: S
 }
 
-const defaultFilters: ISearch = {offset: 0, limit: 10,};
+const defaultFilters: ISearch = {offset: 0, limit: 10,}
 
-export const usePaginate = <T, S extends ISearch>(
+export const usePaginate = <T, S extends ISearch, E = any>(
   fetcher: (search: S) => Promise<Paginate<T>>,
-  initialFilters?: S,
-): UsePaginate<T, S> => {
-  const [filters, setFilters] = useState<S>({...defaultFilters, ...(initialFilters || {}) as any});
-  const [list, fetching, fetch, set, clearCache] = useFetcher<Paginate<T>>(fetcher);
+  initialFilters: S,
+  mapError: (_: any) => E = _ => _
+): UsePaginate<T, S, E> => {
+  const [filters, setFilters] = useState<S>({...defaultFilters, ...initialFilters})
+  const {entity: list, error, loading: fetching, fetch, setEntity: set, clearCache} = useFetcher<Paginate<T>, E>(fetcher, undefined, mapError)
+
+  const updateFilters = (update: SetStateAction<S>, refetch = true) => {
+    setFilters(prev => {
+      const updatedFilters = typeof update === 'function' ? update(prev) : update
+      if (refetch) fetch({force: true, clean: false})(updatedFilters)
+      return updatedFilters
+    })
+  }
 
   return {
     list,
+    error,
     fetching,
-    fetch: (args: {force?: boolean, clean?: boolean}) => fetch(args)(filters),
+    fetch: (args: {force?: boolean, clean?: boolean} = {}) => fetch(args)(filters),
     filters,
-    setFilters: (filters: S, refetch = true) => {
-      setFilters({...defaultFilters, ...filters});
-      if (refetch) {
-        fetch({force: true, clean: false})(filters);
-      }
-    },
-  };
-};
+    pageNumber: filters.offset / filters.limit,
+    updateFilters,
+    clearFilters: () => updateFilters(initialFilters),
+    initialFilters
+  }
+}

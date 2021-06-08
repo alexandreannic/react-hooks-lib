@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useState} from 'react';
+import {Dispatch, SetStateAction, useState} from 'react'
 
 export interface UseFormInputOptions {
   initialValue?: string
@@ -18,15 +18,15 @@ export interface useFormInput {
 }
 
 export const useFormInput = (name: string, options?: UseFormInputOptions) => {
-  const {initialValue, pattern, errorMessage, required} = options || {};
-  const [value, setValue] = useState(initialValue || '');
-  const [isTouched, setIsTouched] = useState(false);
-  const [isBlured, setIsBlured] = useState(false);
+  const {initialValue, pattern, errorMessage, required} = options || {}
+  const [value, setValue] = useState(initialValue || '')
+  const [isTouched, setIsTouched] = useState(false)
+  const [isBlured, setIsBlured] = useState(false)
   const isValid = !options || (
     (!pattern || new RegExp(pattern).test(value || '')) &&
     (!required || (value && value !== ''))
-  );
-  const showError = isBlured && !isValid;
+  )
+  const showError = isBlured && !isValid
   return {
     props: {
       error: showError,
@@ -40,5 +40,5 @@ export const useFormInput = (name: string, options?: UseFormInputOptions) => {
     },
     setValue,
     isValid: () => isValid
-  };
-};
+  }
+}
