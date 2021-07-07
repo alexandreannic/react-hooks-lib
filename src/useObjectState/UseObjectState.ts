@@ -1,6 +1,7 @@
 import {Dispatch, SetStateAction, useState} from 'react'
+import {useFetcher} from '..'
 
-type ReturnType<T> = [
+type UseObjectStateReturn<T> = [
   {[key: string]: T},
   (k: string, t: T) => void,
   (k: string) => void,
@@ -8,7 +9,7 @@ type ReturnType<T> = [
   Dispatch<SetStateAction<{[key: string]: T}>>
 ];
 
-export const useObjectState = <T>(initialValue: {[key: string]: T} = {}): ReturnType<T> => {
+export const useObjectState = <T>(initialValue: {[key: string]: T} = {}): UseObjectStateReturn<T> => {
   const [obj, setObj] = useState<{[key: string]: T}>(initialValue)
 
   const set = (key: string, value: T): void => {
