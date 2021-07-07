@@ -1,6 +1,6 @@
-import {Fetch, useFetcher} from '../useFetcher/UseFetcher'
+import {Fetch, useFetcher} from '..'
 import {useState} from 'react'
-import {useSetState} from '../useSetState/UseSetState'
+import {useSetState} from '..'
 
 export type Id = string;
 
@@ -68,7 +68,7 @@ interface UseCrudParams<E> {
 
 export const useCrudList: UseCrudList = <E extends Entity>({c, r, u, d}: UseCrudParams<E>) => {
   const [creating, setCreating] = useState(false)
-  const {entity: list, loading: fetching, fetch, setEntity: set, clearCache} = useFetcher<E[]>(r!)
+  const {entity: list, loading: fetching, fetch, setEntity: set, clearCache} = useFetcher<ReadAction<E[]>>(r!)
   const removeList = useSetState<Id>()
   const updatingList = useSetState<Id>()
 
