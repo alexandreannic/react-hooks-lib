@@ -34,17 +34,17 @@ export interface Delete<E, PK extends keyof E, ERR> {
   removeError: (pk: E[PK]) => ERR | undefined
 }
 
-export type CrudListR<E, PK extends keyof E, ERR> = Read<E, PK, ERR>;
-export type CrudListRD<E, PK extends keyof E, ERR> = Read<E, PK, ERR> & Delete<E, PK, ERR>;
-export type CrudListRU<E, PK extends keyof E, ERR> = Read<E, PK, ERR> & Update<E, PK, ERR>;
-export type CrudListRUD<E, PK extends keyof E, ERR> = Read<E, PK, ERR> & Update<E, PK, ERR> & Delete<E, PK, ERR>;
-export type CrudListCRD<E, PK extends keyof E, ERR> = Create<E, ERR> & Read<E, PK, ERR> & Delete<E, PK, ERR>;
-export type CrudListCRUD<E, PK extends keyof E, ERR> = Create<E, ERR> & Read<E, PK, ERR> & Delete<E, PK, ERR> & Update<E, PK, ERR>;
-export type CrudListCR<E, PK extends keyof E, ERR> = Create<E, ERR> & Read<E, PK, ERR>;
-export type CrudListC<E, PK extends keyof E, ERR> = Create<E, ERR>;
-export type CrudListD<E, PK extends keyof E, ERR> = Delete<E, PK, ERR>;
-export type CrudListCUD<E, PK extends keyof E, ERR> = Create<E, ERR> & Delete<E, PK, ERR> & Update<E, PK, ERR>;
-export type CrudListCD<E, PK extends keyof E, ERR> = Create<E, ERR> & Delete<E, PK, ERR>;
+export type CrudListR<E, PK extends keyof E, ERR = any> = Read<E, PK, ERR>;
+export type CrudListRD<E, PK extends keyof E, ERR = any> = Read<E, PK, ERR> & Delete<E, PK, ERR>;
+export type CrudListRU<E, PK extends keyof E, ERR = any> = Read<E, PK, ERR> & Update<E, PK, ERR>;
+export type CrudListRUD<E, PK extends keyof E, ERR = any> = Read<E, PK, ERR> & Update<E, PK, ERR> & Delete<E, PK, ERR>;
+export type CrudListCRD<E, PK extends keyof E, ERR = any> = Create<E, ERR> & Read<E, PK, ERR> & Delete<E, PK, ERR>;
+export type CrudListCRUD<E, PK extends keyof E, ERR = any> = Create<E, ERR> & Read<E, PK, ERR> & Delete<E, PK, ERR> & Update<E, PK, ERR>;
+export type CrudListCR<E, PK extends keyof E, ERR = any> = Create<E, ERR> & Read<E, PK, ERR>;
+export type CrudListC<E, PK extends keyof E, ERR = any> = Create<E, ERR>;
+export type CrudListD<E, PK extends keyof E, ERR = any> = Delete<E, PK, ERR>;
+export type CrudListCUD<E, PK extends keyof E, ERR = any> = Create<E, ERR> & Delete<E, PK, ERR> & Update<E, PK, ERR>;
+export type CrudListCD<E, PK extends keyof E, ERR = any> = Create<E, ERR> & Delete<E, PK, ERR>;
 
 export interface UseCrudList {
   <E, PK extends keyof E, ERR = any>(pk: PK, _: {r: ReadAction<E[]>}): CrudListR<E, PK, ERR>
