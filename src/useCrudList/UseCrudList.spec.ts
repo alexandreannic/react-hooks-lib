@@ -1,24 +1,27 @@
-import {Id, useCrudList} from './UseCrudList'
+import {useCrudList} from './UseCrudList'
 import {expect} from 'chai'
 
 interface User {
-  id: Id
+  id: string
   name?: string
+  other?: number
 }
 
 const createUserApi = () => {
   const users: User[] = [{id: '1', name: 'Mat Fraser'}]
   return {
     users,
-    fetch: () => Promise.resolve(users),
-    create: (u: User) => {
+    fetch: (): Promise<User[]> => Promise.resolve(users),
+    create: (u: User): Promise<User> => {
       users.push(u)
       return Promise.resolve(u)
     },
-    update: (id: Id, updatedUser: User) => Promise.resolve({
-      ...users.map(_ => (_.id === id) ? {..._, ...updatedUser} : _),
+    update: (id: any, updatedUser: User): Promise<User> => Promise.resolve({
+      ...users.find(_ => _.id === id), ...updatedUser
     }),
-    delete: (id: Id) => Promise.resolve(users.filter(_ => _.id !== id)),
+    delete: async (id: string) => {
+      await Promise.resolve(users.filter(_ => _.id !== id))
+    },
   }
 }
 
@@ -28,7 +31,7 @@ describe('UseCrudList', function () {
 
     const userApi = createUserApi()
 
-    const crud = useCrudList<User>({
+    const crud = useCrudList('id', {
       r: userApi.fetch,
     })
 
@@ -36,18 +39,23 @@ describe('UseCrudList', function () {
     expect(crud.list).deep.eq(userApi.users)
   })
 
-  // it('should return the correct number', async function () {
-  //   const crud = useCrudList<User>({
-  //     r: (): Promise<User> => Promise.resolve({id: ''}),
-  //     d: (): Promise<void> => Promise.resolve(),
-  //     u: (id: Id): Promise<User> => Promise.resolve({id: ''}),
-  //     c: (user: User): Promise<User> => Promise.resolve({id: ''}),
-  //   });
-  //
-  //   crud.list();
-  //   crud.clearCache();
-  //   crud.create({a: ''});
-  //   crud.update('1');
-  //   crud.remove('1');
-  // });
+  it('should return the correct number', async function () {
+    const userApi = createUserApi()
+
+    const crud = useCrudList('id', {
+      c: userApi.create,
+      r: userApi.fetch,
+      u: userApi.update,
+      d: userApi.delete,
+    })
+
+    crud.createError
+    crud.fetchError
+    crud.removeError
+    crud.fetch()
+    crud.clearCache()
+    crud.create({a: ''})
+    crud.update('1')
+    crud.remove('1')
+  })
 })
