@@ -49,6 +49,9 @@ describe('UseCrudList', function () {
       d: userApi.delete,
     })
 
+    crud.createError
+    crud.fetchError
+    crud.removeError
     crud.fetch()
     crud.clearCache()
     crud.create({a: ''})
