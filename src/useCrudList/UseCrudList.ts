@@ -6,10 +6,14 @@ type CreateAction<E> = (...args: any[]) => Promise<E>;
 type UpdateAction<E, PK extends keyof E> = (pk: E[PK], ...args: any[]) => Promise<E>
 type DeleteAction<E, PK extends keyof E> = (pk: E[PK], ...args: any[]) => Promise<void>
 
+interface CreateActionParams {
+  insert?: boolean,
+  insertBefore?: boolean
+}
 
-export interface Create<T, ERR> {
+export interface Create<E, ERR> {
   creating: boolean
-  create: ReadAction<T>
+  create: (_?: CreateActionParams, ..._2: Parameters<CreateAction<E>>) => ReturnType<CreateAction<E>>
   createError?: ERR
 }
 
@@ -82,12 +86,15 @@ export const useCrudList: UseCrudList = <E, PK extends keyof E, ERR = any>(
   const updatingList = useSetState<E[PK]>()
   const updatingListError = useMap<E[PK], ERR | undefined>()
 
-  const create = async (...args: any[]): Promise<E> => {
+  const create = ({insert = true, insertBefore = false}: CreateActionParams = {}) => async (...args: any[]): Promise<E> => {
     try {
       setCreating(true)
       const entity = await c!(...args)
-      if (r) {
-        set([...(list || []), entity])
+      if (r && insert) {
+        set((prev: E[] | undefined) => {
+          if (insertBefore) return {entity, ...(prev ?? [])}
+          else return {...(prev ?? []), entity}
+        })
       }
       setCreating(false)
       setCreateError(undefined)
