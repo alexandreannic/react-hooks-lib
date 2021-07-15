@@ -1,12 +1,19 @@
 import {Dispatch, SetStateAction, useRef, useState} from 'react'
 
-export type Fetch<T> = (args?: {force?: boolean, clean?: boolean}) => T;
+export type Func<R = any> = (...args: any[]) => R
+
+export type Fetch<T extends Func> = (p?: {force?: boolean, clean?: boolean}, ..._: Parameters<T>) => T;
+
+export interface FetchParams {
+  force?: boolean,
+  clean?: boolean
+}
 
 type ThenArg<T> = T extends PromiseLike<infer U> ? U : T
 
-type FetcherResult<T extends (...args: any[]) => any> = ThenArg<ReturnType<T>>
+type FetcherResult<T extends Func> = ThenArg<ReturnType<T>>
 
-export type UseFetcher<F extends (...args: any[]) => Promise<FetcherResult<F>>, E = any> = {
+export type UseFetcher<F extends Func<Promise<FetcherResult<F>>>, E = any> = {
   entity?: FetcherResult<F>,
   loading: boolean,
   error?: E
@@ -18,7 +25,7 @@ export type UseFetcher<F extends (...args: any[]) => Promise<FetcherResult<F>>, 
 /**
  * Factorize fetching logic which goal is to prevent unneeded fetchs and expose loading indicator.
  */
-export const useFetcher = <F extends (...args: any[]) => Promise<any>, E = any>(
+export const useFetcher = <F extends Func<Promise<any>>, E = any>(
   fetcher: F,
   initialValue?: FetcherResult<F>,
   mapError: (_: any) => E = _ => _
@@ -28,7 +35,7 @@ export const useFetcher = <F extends (...args: any[]) => Promise<any>, E = any>(
   const [loading, setLoading] = useState<boolean>(false)
   const fetch$ = useRef<Promise<FetcherResult<F>>>()
 
-  const fetch = ({force = true, clean = true}: {force?: boolean, clean?: boolean} = {}) => (...args: any[]): Promise<FetcherResult<F>> => {
+  const fetch = ({force = true, clean = true}: FetchParams = {}, ...args: any[]): Promise<FetcherResult<F>> => {
     if (fetch$.current) {
       return fetch$.current!
     }
@@ -53,7 +60,7 @@ export const useFetcher = <F extends (...args: any[]) => Promise<any>, E = any>(
         setError(mapError(e))
         setEntity(undefined)
         // return Promise.reject(e)
-        throw e;
+        throw e
       })
     return fetch$.current
   }
