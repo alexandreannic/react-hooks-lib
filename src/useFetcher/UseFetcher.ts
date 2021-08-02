@@ -2,7 +2,7 @@ import {Dispatch, SetStateAction, useRef, useState} from 'react'
 
 export type Func<R = any> = (...args: any[]) => R
 
-export type Fetch<T extends Func> = (p?: {force?: boolean, clean?: boolean}, ..._: Parameters<T>) => T;
+export type Fetch<T extends Func<Promise<FetcherResult<T>>>> = (p?: {force?: boolean, clean?: boolean}, ..._: Parameters<T>) => ReturnType<T>;
 
 export interface FetchParams {
   force?: boolean,

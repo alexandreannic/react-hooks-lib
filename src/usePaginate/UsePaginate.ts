@@ -19,7 +19,7 @@ export interface UsePaginate<T, S, E = any> {
   list?: Paginate<T>,
   error?: E
   fetching: boolean,
-  fetch: Fetch<Promise<Paginate<T>>>
+  fetch: Fetch<(...args: any[]) => Promise<Paginate<T>>>
   filters: S,
   updateFilters: (_: SetStateAction<S>, refetch?: boolean) => void,
   clearFilters: () => void,
@@ -40,7 +40,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
   const updateFilters = (update: SetStateAction<S>, refetch = true) => {
     setFilters(prev => {
       const updatedFilters = typeof update === 'function' ? update(prev) : update
-      if (refetch) fetch({force: true, clean: false})(updatedFilters)
+      if (refetch) fetch({force: true, clean: false}, updatedFilters)
       return updatedFilters
     })
   }
@@ -49,7 +49,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
     list,
     error,
     fetching,
-    fetch: (args: {force?: boolean, clean?: boolean} = {}) => fetch(args)(filters),
+    fetch: (args: {force?: boolean, clean?: boolean} = {}) => fetch(args, filters),
     filters,
     pageNumber: filters.offset / filters.limit,
     updateFilters,
