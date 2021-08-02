@@ -1,17 +1,18 @@
 import {useCrudList} from './UseCrudList'
 import {expect} from 'chai'
 
-interface User {
+export interface User {
   id: string
   name?: string
+  online?: boolean
   other?: number
 }
 
-const createUserApi = () => {
+export const createUserApi = () => {
   const users: User[] = [{id: '1', name: 'Mat Fraser'}]
   return {
     users,
-    fetch: (): Promise<User[]> => Promise.resolve(users),
+    fetch: ({onlineOnly}: {onlineOnly?: boolean}): Promise<User[]> => Promise.resolve(users.filter(u => !onlineOnly || u.online)),
     create: (u: User): Promise<User> => {
       users.push(u)
       return Promise.resolve(u)
@@ -20,7 +21,7 @@ const createUserApi = () => {
       ...users.find(_ => _.id === id), ...updatedUser
     }),
     delete: async (id: string) => {
-      await Promise.resolve(users.filter(_ => _.id !== id))
+      users.filter(_ => _.id !== id)
     },
   }
 }
@@ -35,7 +36,7 @@ describe('UseCrudList', function () {
       r: userApi.fetch,
     })
 
-    await crud.fetch({})()
+    await crud.fetch({})
     expect(crud.list).deep.eq(userApi.users)
   })
 
@@ -54,7 +55,7 @@ describe('UseCrudList', function () {
     crud.removeError
     crud.fetch()
     crud.clearCache()
-    crud.create({a: ''})
+    crud.create({}, {a: ''})
     crud.update('1')
     crud.remove('1')
   })
