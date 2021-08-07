@@ -1,5 +1,5 @@
 import {Fetch, useFetcher} from '..'
-import {SetStateAction, useState} from 'react'
+import {Dispatch, SetStateAction, useState} from 'react'
 
 export interface Paginate<T> {
   data: T[]
@@ -22,6 +22,7 @@ export interface UsePaginate<T, S, E = any> {
   fetch: Fetch<(...args: any[]) => Promise<Paginate<T>>>
   filters: S,
   updateFilters: (_: SetStateAction<S>, refetch?: boolean) => void,
+  setEntity: Dispatch<SetStateAction<Paginate<T> | undefined>>,
   clearFilters: () => void,
   pageNumber: number
   initialFilters: S
@@ -35,7 +36,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
   mapError: (_: any) => E = _ => _
 ): UsePaginate<T, S, E> => {
   const [filters, setFilters] = useState<S>({...defaultFilters, ...initialFilters})
-  const {entity: list, error, loading: fetching, fetch, setEntity: set, clearCache} = useFetcher<typeof fetcher, E>(fetcher, undefined, mapError)
+  const {entity: list, error, loading: fetching, fetch, setEntity, clearCache} = useFetcher<typeof fetcher, E>(fetcher, undefined, mapError)
 
   const updateFilters = (update: SetStateAction<S>, refetch = true) => {
     setFilters(prev => {
@@ -54,6 +55,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
     pageNumber: filters.offset / filters.limit,
     updateFilters,
     clearFilters: () => updateFilters(initialFilters),
-    initialFilters
+    initialFilters,
+    setEntity,
   }
 }
