@@ -23,7 +23,7 @@ export type UseFetcher<F extends Func<Promise<FetcherResult<F>>>, E = any> = {
 };
 
 /**
- * Factorize fetching logic which goal is to prevent unneeded fetchs and expose loading indicator.
+ * Factorize fetching logic which goal is to prevent unneeded fetchs and expose loading indicator + error status.
  */
 export const useFetcher = <F extends Func<Promise<any>>, E = any>(
   fetcher: F,
@@ -36,11 +36,13 @@ export const useFetcher = <F extends Func<Promise<any>>, E = any>(
   const fetch$ = useRef<Promise<FetcherResult<F>>>()
 
   const fetch = ({force = true, clean = true}: FetchParams = {}, ...args: any[]): Promise<FetcherResult<F>> => {
-    if (fetch$.current) {
-      return fetch$.current!
-    }
-    if (entity && !force) {
-      return Promise.resolve(entity)
+    if(!force) {
+      if (fetch$.current) {
+        return fetch$.current!
+      }
+      if (entity) {
+        return Promise.resolve(entity)
+      }
     }
     if (clean) {
       setError(undefined)
