@@ -21,11 +21,15 @@ export interface UsePaginate<T, S, E = any> {
   fetching: boolean,
   fetch: Fetch<(...args: any[]) => Promise<Paginate<T>>>
   filters: S,
-  updateFilters: (_: SetStateAction<S>, refetch?: boolean) => void,
+  updateFilters: (_: SetStateAction<S>, params?: UpdateFiltersParams) => void,
   setEntity: Dispatch<SetStateAction<Paginate<T> | undefined>>,
   clearFilters: () => void,
   pageNumber: number
   initialFilters: S
+}
+
+export interface UpdateFiltersParams {
+  noRefetch?: boolean
 }
 
 const defaultFilters: ISearch = {offset: 0, limit: 10,}
@@ -38,10 +42,10 @@ export const usePaginate = <T, S extends ISearch, E = any>(
   const [filters, setFilters] = useState<S>({...defaultFilters, ...initialFilters})
   const {entity: list, error, loading: fetching, fetch, setEntity, clearCache} = useFetcher<typeof fetcher, E>(fetcher, undefined, mapError)
 
-  const updateFilters = (update: SetStateAction<S>, refetch = true) => {
+  const updateFilters = (update: SetStateAction<S>, {noRefetch = false}: UpdateFiltersParams = {}) => {
     setFilters(prev => {
       const updatedFilters = typeof update === 'function' ? update(prev) : update
-      if (refetch) fetch({force: true, clean: false}, updatedFilters)
+      if (!noRefetch) fetch({force: true, clean: false}, updatedFilters)
       return updatedFilters
     })
   }
