@@ -1,6 +1,6 @@
 {
   "name": "@alexandreannic/react-hooks-lib",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Bunch of react hooks",
   "main": "lib/index.js",
   "private": false,
