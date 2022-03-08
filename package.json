@@ -6,7 +6,8 @@
   "private": false,
   "scripts": {
     "test": "npm run build && mocha -r ts-node/register src/**/*.spec.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "release": "ts-node release.ts"
   },
   "author": "alexandre.annic1@gmail.com",
   "license": "ISC",
