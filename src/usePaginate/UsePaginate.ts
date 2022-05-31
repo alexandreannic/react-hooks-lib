@@ -1,5 +1,5 @@
 import {Fetch, useFetcher} from '..'
-import {Dispatch, SetStateAction, useState} from 'react'
+import {Dispatch, SetStateAction, useCallback, useState} from 'react'
 
 export interface Paginate<T> {
   data: T[]
@@ -43,7 +43,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
   const [filters, setFilters] = useState<S>({...defaultFilters, ...initialFilters})
   const {entity: list, error, loading: fetching, fetch, setEntity, clearCache} = useFetcher<typeof fetcher, E>(fetcher, undefined, mapError)
 
-  const updateFilters = (update: SetStateAction<S>, {noRefetch, preserveOffset}: UpdateFiltersParams = {}) => {
+  const updateFilters = useCallback((update: SetStateAction<S>, {noRefetch, preserveOffset}: UpdateFiltersParams = {}) => {
     setFilters(mutableFilters => {
       const previous = {...mutableFilters}
       const updatedFilters = typeof update === 'function' ? update(mutableFilters) : update
@@ -55,7 +55,9 @@ export const usePaginate = <T, S extends ISearch, E = any>(
       }
       return updatedFilters
     })
-  }
+  }, [])
+
+  const clearFilters = useCallback(() => updateFilters(initialFilters), [])
 
   return {
     list,
@@ -65,7 +67,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
     filters,
     pageNumber: filters.offset / filters.limit,
     updateFilters,
-    clearFilters: () => updateFilters(initialFilters),
+    clearFilters,
     initialFilters,
     setEntity,
   }
