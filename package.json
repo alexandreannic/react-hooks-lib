@@ -1,13 +1,13 @@
 {
   "name": "@alexandreannic/react-hooks-lib",
-  "version": "1.11.8",
+  "version": "1.11.9",
   "description": "Bunch of react hooks",
   "main": "lib/index.js",
   "private": false,
   "scripts": {
     "test": "npm run build && mocha -r ts-node/register src/**/*.spec.ts",
     "build": "tsc",
-    "release": "ts-node release.ts"
+    "release": "npm run build && ts-node release.ts"
   },
   "author": "alexandre.annic1@gmail.com",
   "license": "ISC",
