@@ -15,15 +15,18 @@ export interface ISearch<T = any> {
   sortBy?: keyof T
 }
 
-export interface UsePaginate<T, S, E = any> extends Pick<UseFetcher<any, E>, 'error' | 'setEntity' | 'clearCache'> {
+export interface UsePaginate<T, S, E = any> {
   list?: Paginate<T>,
+  error?: E
+  fetching: boolean,
   fetch: Fetch<(...args: any[]) => Promise<Paginate<T>>>
   filters: S,
   updateFilters: (_: SetStateAction<S>, params?: UpdateFiltersParams) => void,
+  setEntity: Dispatch<SetStateAction<Paginate<T> | undefined>>,
   clearFilters: () => void,
   pageNumber: number
   initialFilters: S
-  fetching: boolean,
+  clearCache: () => void
 }
 
 export interface UpdateFiltersParams {
