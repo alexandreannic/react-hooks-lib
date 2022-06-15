@@ -12,7 +12,7 @@ export interface UseMap<K, V> {
   reset: (arr: V[], getKey: (v: V) => K) => void
 }
 
-export const useMap = <K extends string | number | symbol, V>(initialValue: Map<K, V> = new Map()): UseMap<K, V> => {
+export const useMap = <K, V>(initialValue: Map<K, V> = new Map()): UseMap<K, V> => {
   const [map, setMap] = useState<Map<K, V>>(initialValue)
 
   return {
