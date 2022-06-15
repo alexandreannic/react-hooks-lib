@@ -9,12 +9,17 @@ export interface UseMap<K, V> {
   delete: (k: K) => void
   size: number
   get: (k: K) => V | undefined
+  reset: (arr: V[], getKey: (v: V) => K) => void
 }
 
 export const useMap = <K, V>(initialValue: Map<K, V> = new Map()): UseMap<K, V> => {
   const [map, setMap] = useState<Map<K, V>>(initialValue)
 
   return {
+    reset: (arr: V[], getKey: (v: V) => K) => {
+      const index: [K, V][] = arr.map(_ => [getKey(_), _])
+      setMap(new Map(index))
+    },
     set: (k: K, v: V): void => {
       const newMap = map.set(k, v)
       setMap(new Map(newMap))
