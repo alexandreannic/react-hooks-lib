@@ -1,6 +1,6 @@
 {
   "name": "@alexandreannic/react-hooks-lib",
-  "version": "1.11.12",
+  "version": "1.11.13",
   "description": "Bunch of react hooks",
   "main": "lib/index.js",
   "private": false,
@@ -12,7 +12,7 @@
   "author": "alexandre.annic1@gmail.com",
   "license": "ISC",
   "peerDependencies": {
-    "react": "17.0.2"
+    "react": ">= 17.0.2"
   },
   "devDependencies": {
     "@types/chai": "4.3.0",
