@@ -4,7 +4,7 @@ export interface UseSetState<T> {
   add: (t: T | T[]) => void
   toggle: (t: T) => void
   toggleAll: (t: T[]) => void
-  delete: (t: T) => boolean
+  delete: (t: T | T[]) => boolean
   clear: () => void
   values: () => Iterable<T>
   toArray: () => T[]
@@ -28,10 +28,10 @@ export const useSetState = <T>(initialValue: T[] = []): UseSetState<T> => {
     }
   }
 
-  const remove = (t: T): boolean => {
-    const returnValue = set.delete(t)
+  const remove = (t: T | T[]): boolean => {
+    const returnValue = [t].flatMap(_ => _).map(set.delete)
     setSet(new Set(set))
-    return returnValue
+    return returnValue[returnValue.length - 1]
   }
 
   const toggle = (t: T): void => {
