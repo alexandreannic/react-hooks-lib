@@ -29,7 +29,7 @@ export const useSetState = <T>(initialValue: T[] = []): UseSetState<T> => {
   }
 
   const remove = (t: T | T[]): boolean => {
-    const returnValue = [t].flatMap(_ => _).map(set.delete)
+    const returnValue = [t].flatMap(_ => _).map(_ => set.delete(_))
     setSet(new Set(set))
     return returnValue[returnValue.length - 1]
   }
