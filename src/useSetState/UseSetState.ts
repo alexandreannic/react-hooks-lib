@@ -19,7 +19,7 @@ export const useSetState = <T>(initialValue: T[] = []): UseSetState<T> => {
 
   const add = (t: T | T[]): void => {
     if (Array.isArray(t)) {
-      const newSet = new Set(t)
+      const newSet = new Set([...set.values(), ...t])
       setSet(newSet)
     } else {
       set.add(t)
