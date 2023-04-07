@@ -52,7 +52,6 @@ export const useAsync: UseAsyncFn = <F extends Func<Promise<any>>, K extends num
 
   const call = (...args: Parameters<F>) => {
     loading.set(requestKey(args), true)
-    // setLoading(true)
     return caller(...args)
       .then(_ => {
         loading.set(requestKey(args), false)
