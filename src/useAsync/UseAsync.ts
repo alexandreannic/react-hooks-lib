@@ -1,40 +1,74 @@
-import {useState} from 'react'
 import {Func} from '../useFetcher/UseFetcher'
+import {useMap} from '../useMap/UseMap'
 
-export type UseAsync<F extends Func<Promise<any>>, E = any> = {
-  loading: boolean,
-  error?: E
+export interface UseAsync<F extends Func<Promise<any>>, K extends number | symbol | string = any, E = any> {
+  getLoading: (k?: K) => boolean,
+  getError: (k?: K) => E
   call: F,
-};
+}
+
+export interface UseAsyncFn {
+  <F extends Func<Promise<any>>, K extends number | symbol | string = any, E = any>(
+    caller: F,
+    params: {
+      mapError?: (_: any) => E,
+      requestKey: (_: Parameters<F>) => K,
+    }
+  ): {
+    getLoading: (k: K) => boolean,
+    getError: (k: K) => E
+    call: F,
+  }
+  <F extends Func<Promise<any>>, K extends number | symbol | string = any, E = any>(
+    caller: F,
+    params?: {
+      mapError?: (_: any) => E,
+      requestKey?: undefined,
+    }
+  ): {
+    getLoading: () => boolean,
+    getError: () => E
+    call: F,
+  }
+}
+
+const defaultKey: any = 1
 
 /**
  * Factorize async by exposing loading indicator and error status.
  */
-export const useAsync = <F extends Func<Promise<any>>, E = any>(
+export const useAsync: UseAsyncFn = <F extends Func<Promise<any>>, K extends number | symbol | string = any, E = any>(
   caller: F,
-  mapError: (_: any) => E = _ => _
-): UseAsync<F, E> => {
-  const [error, setError] = useState<E | undefined>()
-  const [loading, setLoading] = useState<boolean>(false)
+  {
+    mapError = _ => _,
+    requestKey = () => defaultKey
+  }: {
+    mapError?: (_: any) => E,
+    requestKey?: (_: Parameters<F>) => K,
+  } = {} as any
+) => {
+  const loading = useMap<K, boolean>()
+  const error = useMap<K, E>()
 
-  const call = (...args: any[]) => {
-    setLoading(true)
+  const call = (...args: Parameters<F>) => {
+    loading.set(requestKey(args), true)
+    // setLoading(true)
     return caller(...args)
       .then(_ => {
-        setLoading(false)
+        loading.set(requestKey(args), false)
         return _
       })
       .catch((e: E) => {
-        setLoading(false)
-        setError(mapError(e))
+        loading.set(requestKey(args), false)
+        error.set(requestKey(args), mapError(e))
         throw e
       })
   }
 
   return {
-    loading,
-    error,
-    // @ts-ignore
+    getLoading: (k?: K) => loading.get(k ? k : defaultKey),
+    getError: (k?: K) => error.get(k ? k : defaultKey),
     call,
-  }
+  } as any
 }
+
