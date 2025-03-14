@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "release": "npm run build && ts-node release.ts"
+    "release": "npm run build && ts-node release.sh"
   },
   "author": "alexandre.annic1@gmail.com",
   "license": "ISC",

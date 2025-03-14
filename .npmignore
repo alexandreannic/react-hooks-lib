@@ -3,4 +3,4 @@ tsconfig.json
 .idea
 jest.config.js
 jest.setup.js
-release.ts
+release.sh
