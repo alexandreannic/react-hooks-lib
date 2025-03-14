@@ -2,14 +2,24 @@
 
 Comprehensive suite of custom React hooks with clear, consistent APIs and robust TypeScript inference.
 
-## [useFetcher](src/useFetcher)
+
+
+## Install
+
+```
+npm install --save @axanc/react-hooks
+```
+
+## Examples
+
+### [useFetcher](src/useFetcher)
 
 `useFetcher` is a custom hook that simplifies data fetching by handling caching, loading states, and error management
 with full TypeScript inference.
 
 ```tsx
 import React, {useEffect} from 'react'
-import {useFetcher} from 'your-hooks-library'
+import {useFetcher} from '@axanc/react-hooks'
 
 const getUser = async (userId: number): Promise<{id: number, name: string}> => {
   return new Promise((resolve) => {
@@ -46,22 +56,17 @@ export function UserComponent({userId}: {userId: number}) {
 }
 ```
 
-## [useEffectFn](src/useEffectFn)
-
-## [useFormInput](src/useFormInput)
-
-## [useInterval](src/useInterval)
-
-## [useMap](src/useMap)
-
-## [useMemoFn](src/useMemoFn)
-
-## [useObjectState](src/useObjectState)
-
-## [usePaginate](src/usePaginate)
-
-## [usePrevious](src/usePrevious)
-
-## [useSetState](src/useSetState)
-
-## [useTimeout](src/useTimeout)
+### [useAsync](src/useAsync)
+### [useBoolean](src/useBoolean)
+### [useCrudList](src/useCrudList)
+### [useEffectFn](src/useEffectFn)
+### [useFetcher](src/useFetcher)
+### [useFormInput](src/useFormInput)
+### [useInterval](src/useInterval)
+### [useMap](src/useMap)
+### [useMemoFn](src/useMemoFn)
+### [useObjectState](src/useObjectState)
+### [usePaginate](src/usePaginate)
+### [usePrevious](src/usePrevious)
+### [useSetState](src/useSetState)
+### [useTimeout](src/useTimeout)
