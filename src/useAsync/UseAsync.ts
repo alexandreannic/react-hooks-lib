@@ -1,40 +1,89 @@
 import {useState} from 'react'
 import {Func} from '../useFetcher/UseFetcher'
+import { useMap } from '..'
 
-export type UseAsync<F extends Func<Promise<any>>, E = any> = {
-  loading: boolean,
+type Key = number | string
+
+interface UseAsyncBase<F extends Func<Promise<any>>> {
+  call: F
+  callIndex: number
+}
+
+export interface UseAsyncSimple<F extends Func<Promise<any>>, E = any> extends UseAsyncBase<F> {
   error?: E
-  call: F,
-};
+  loading: boolean
+}
+
+export interface UseAsyncMultiple<F extends Func<Promise<any>>, K extends Key = any, E = any> extends UseAsyncBase<F> {
+  anyLoading: boolean
+  lastError?: E
+  loading: Record<K, boolean>
+  error: Record<K, E>
+}
+
+export interface UseAsyncFn {
+  <F extends Func<Promise<any>>, K extends Key = any, E = any>(
+    caller: F,
+    params: {
+      mapError?: (_: any) => E
+      requestKey: (_: Parameters<F>) => K
+    },
+  ): UseAsyncMultiple<F, K, E>
+  <F extends Func<Promise<any>>, K extends Key = any, E = any>(
+    caller: F,
+    params?: {
+      mapError?: (_: any) => E
+      requestKey?: undefined
+    },
+  ): UseAsyncSimple<F, E>
+}
+
+const DEFAULT_KEY: any = 'DEFAULT_KEY'
 
 /**
  * Factorize async by exposing loading indicator and error status.
  */
-export const useAsync = <F extends Func<Promise<any>>, E = any>(
+export const useAsync: UseAsyncFn = <F extends Func<Promise<any>>, K extends Key = any, E = any>(
   caller: F,
-  mapError: (_: any) => E = _ => _
-): UseAsync<F, E> => {
-  const [error, setError] = useState<E | undefined>()
-  const [loading, setLoading] = useState<boolean>(false)
+  {
+    mapError = (_) => _,
+    requestKey,
+  }: {
+    mapError?: (_: any) => E
+    requestKey?: (_: Parameters<F>) => K
+  } = {} as any,
+) => {
+  const loading = useMap<K, boolean>()
+  const error = useMap<K, E>()
+  const [callIndex, setCallIndex] = useState(0)
+  const [lastError, setLastError] = useState<E | undefined>()
 
-  const call = (...args: any[]) => {
-    setLoading(true)
+  const call = (...args: Parameters<F>) => {
+    setLastError(undefined)
+    const key = requestKey ? requestKey(args) : DEFAULT_KEY
+    loading.set(key, true)
     return caller(...args)
-      .then(_ => {
-        setLoading(false)
+      .then((_: any) => {
+        loading.delete(key)
+        setCallIndex((_) => _ + 1)
         return _
       })
       .catch((e: E) => {
-        setLoading(false)
-        setError(mapError(e))
-        throw e
+        setCallIndex((_) => _ + 1)
+        setLastError(e)
+        loading.delete(key)
+        error.set(key, mapError(e))
       })
   }
 
+  const anyLoading = loading.keys.length > 0
+
   return {
-    loading,
-    error,
-    // @ts-ignore
+    callIndex,
+    lastError,
+    anyLoading,
+    loading: requestKey ? loading.toObject : (loading.get(DEFAULT_KEY) as any),
+    error: requestKey ? error.toObject : (error.get(DEFAULT_KEY) as any),
     call,
   }
 }

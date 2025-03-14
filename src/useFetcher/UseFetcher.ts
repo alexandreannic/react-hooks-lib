@@ -1,11 +1,14 @@
-import {Dispatch, SetStateAction, useRef, useState} from 'react'
+import {Dispatch, SetStateAction, useMemo, useRef, useState} from 'react'
 
 export type Func<R = any> = (...args: any[]) => R
 
-export type Fetch<T extends Func<Promise<FetcherResult<T>>>> = (p?: {force?: boolean, clean?: boolean}, ..._: Parameters<T>) => ReturnType<T>;
+export type Fetch<T extends Func<Promise<FetcherResult<T>>>> = (
+  p?: {force?: boolean; clean?: boolean},
+  ..._: Parameters<T>
+) => Promise<ThenArg<ReturnType<T>> | undefined>
 
 export interface FetchParams {
-  force?: boolean,
+  force?: boolean
   clean?: boolean
 }
 
@@ -14,72 +17,108 @@ type ThenArg<T> = T extends PromiseLike<infer U> ? U : T
 type FetcherResult<T extends Func> = ThenArg<ReturnType<T>>
 
 export type UseFetcher<F extends Func<Promise<FetcherResult<F>>>, E = any> = {
-  entity?: FetcherResult<F>,
-  loading: boolean,
+  get?: FetcherResult<F>
+  set: Dispatch<SetStateAction<FetcherResult<F> | undefined>>
+  loading: boolean
   error?: E
-  fetch: Fetch<F>,
-  setEntity: Dispatch<SetStateAction<FetcherResult<F> | undefined>>,
-  clearCache: () => void,
-};
+  fetch: Fetch<F>
+  callIndex: number
+  clearCache: () => void
+}
 
 /**
  * Factorize fetching logic which goal is to prevent unneeded fetchs and expose loading indicator + error status.
  */
 export const useFetcher = <F extends Func<Promise<any>>, E = any>(
   fetcher: F,
-  initialValue?: FetcherResult<F>,
-  mapError: (_: any) => E = _ => _
-): UseFetcher<F, E> => {
+  {
+    initialValue,
+    mapError = (_) => _,
+  }: {
+    initialValue?: FetcherResult<F>
+    mapError?: (_: any) => E
+  } = {},
+): UseFetcher<F> => {
   const [entity, setEntity] = useState<FetcherResult<F> | undefined>(initialValue)
   const [error, setError] = useState<E | undefined>()
   const [loading, setLoading] = useState<boolean>(false)
-  const fetch$ = useRef<Promise<FetcherResult<F>>>()
+  const [callIndex, setCallIndex] = useState(0)
+  const fetch$ = useRef<{queryRef: number; query?: Promise<undefined | FetcherResult<F>>}>({
+    queryRef: 0,
+  })
 
-  const fetch = ({force = true, clean = true}: FetchParams = {}, ...args: any[]): Promise<FetcherResult<F>> => {
-    if(!force) {
-      if (fetch$.current) {
-        return fetch$.current!
+  const clear = () => {
+    setError(undefined)
+    setEntity(undefined)
+  }
+
+  const fetch = (
+    {force = true, clean = true}: FetchParams = {},
+    ...args: Parameters<F>
+  ): Promise<undefined | FetcherResult<F>> => {
+    fetch$.current.queryRef += 1
+    const currQueryRef = fetch$.current.queryRef
+    setCallIndex((prev) => prev + 1)
+
+    if (!force) {
+      if (fetch$.current.query) {
+        return fetch$.current.query // Return existing in-flight request
       }
       if (entity) {
         return Promise.resolve(entity)
       }
+    } else {
+      fetch$.current.query = undefined
     }
+
     if (clean) {
-      setError(undefined)
-      setEntity(undefined)
+      clear()
     }
-    setLoading(true)
-    fetch$.current = fetcher(...args)
-    fetch$.current
+
+    setLoading((_) => {
+      if (currQueryRef === fetch$.current.queryRef) return true
+      return _
+    })
+
+    const promise = fetcher(...args)
       .then((x: FetcherResult<F>) => {
-        setLoading(false)
-        setEntity(x)
-        fetch$.current = undefined
+        if (currQueryRef === fetch$.current.queryRef) {
+          setEntity(x)
+          setLoading(false)
+        }
+        fetch$.current.query = undefined
+        return x
       })
       .catch((e) => {
-        setLoading(false)
-        fetch$.current = undefined
-        setError(mapError(e))
-        setEntity(undefined)
-        // return Promise.reject(e)
-        throw e
+        if (currQueryRef === fetch$.current.queryRef) {
+          setEntity(undefined)
+          setError(mapError(e))
+          setLoading(false)
+        }
+        fetch$.current.query = undefined
+        return undefined
       })
-    return fetch$.current
+
+    fetch$.current.query = promise
+    return promise
   }
 
   const clearCache = () => {
     setEntity(undefined)
     setError(undefined)
-    fetch$.current = undefined
+    fetch$.current.query = undefined
   }
 
-  return {
-    entity,
-    loading,
-    error,
-    // TODO(Alex) not sure the error is legitimate
-    fetch: fetch as any,
-    setEntity,
-    clearCache
-  }
+  return useMemo(
+    () => ({
+      get: entity,
+      set: setEntity,
+      loading,
+      error,
+      callIndex,
+      fetch,
+      clearCache,
+    }),
+    [entity, error, loading, callIndex],
+  )
 }

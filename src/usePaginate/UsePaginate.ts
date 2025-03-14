@@ -41,7 +41,7 @@ export const usePaginate = <T, S extends ISearch, E = any>(
   mapError: (_: any) => E = _ => _
 ): UsePaginate<T, S, E> => {
   const [filters, setFilters] = useState<S>({...defaultFilters, ...initialFilters})
-  const {entity: list, error, loading: fetching, fetch, setEntity, clearCache} = useFetcher<typeof fetcher, E>(fetcher, undefined, mapError)
+  const {get: list, error, loading: fetching, fetch, set: setEntity, clearCache} = useFetcher<typeof fetcher, E>(fetcher, {mapError})
 
   const updateFilters = useCallback((update: SetStateAction<S>, {preserveOffset}: UpdateFiltersParams = {}) => {
     setFilters(mutableFilters => {
