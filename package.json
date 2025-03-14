@@ -6,7 +6,7 @@
   "private": false,
   "scripts": {
     "test": "jest",
-    "build": "tsc",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
     "release": "npm run build && ts-node release.ts"
   },
   "author": "alexandre.annic1@gmail.com",
@@ -25,6 +25,7 @@
     "react-dom": "18.3.1",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
+    "tsup": "^8.4.0",
     "typescript": "5.8.2"
   }
 }
