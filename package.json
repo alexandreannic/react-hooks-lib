@@ -1,6 +1,6 @@
 {
   "name": "@axanc/react-hooks",
-  "version": "1.13.1",
+  "version": "1.13.2",
   "description": "Bunch of react hooks",
   "main": "dist/index.js",
   "private": false,
