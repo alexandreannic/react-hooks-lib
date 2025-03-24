@@ -2,8 +2,6 @@
 
 Comprehensive suite of custom React hooks with clear, consistent APIs and robust TypeScript inference.
 
-
-
 ## Install
 
 ```
@@ -57,16 +55,49 @@ export function UserComponent({userId}: {userId: number}) {
 ```
 
 ### [useAsync](src/useAsync)
+
 ### [useBoolean](src/useBoolean)
+
 ### [useCrudList](src/useCrudList)
+
 ### [useEffectFn](src/useEffectFn)
+
 ### [useFetcher](src/useFetcher)
+
 ### [useFormInput](src/useFormInput)
+
 ### [useInterval](src/useInterval)
+
 ### [useMap](src/useMap)
+
 ### [useMemoFn](src/useMemoFn)
+
 ### [useObjectState](src/useObjectState)
+
+### [usePersistentState](src/usePersistentState)
+
+Hook similar to `useState` who saves state using browser storage (localStorage or sessionStorage).
+
+Basic usage
+
+```ts
+const [persistentState, setPersistentState, clearPersistentState] = usePersistentState(initialValue)
+```
+
+With custom options
+
+```ts
+const [state, setState, clear] = usePersistentState(initialValue, {
+  storageKey: 'custom-key',
+  transformFromStorage: (value) => transformMyValue(value),
+  storageType: 'sessionStorage'
+})
+```
+
 ### [usePaginate](src/usePaginate)
+
 ### [usePrevious](src/usePrevious)
+
 ### [useSetState](src/useSetState)
+
 ### [useTimeout](src/useTimeout)
