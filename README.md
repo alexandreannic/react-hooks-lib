@@ -60,7 +60,7 @@ Hook similar to `useState` who saves state using browser storage (localStorage o
 Basic usage
 
 ```ts
-const [persistentState, setPersistentState, clearPersistentState] = usePersistentState(initialValue)
+const [value, setValue, clearValue] = usePersistentState(initialValue)
 ```
 
 With custom options
