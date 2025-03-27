@@ -53,6 +53,25 @@ export function UserComponent({userId}: {userId: number}) {
   )
 }
 ```
+### [usePersistentState](src/usePersistentState)
+
+Hook similar to `useState` who saves state using browser storage (localStorage or sessionStorage).
+
+Basic usage
+
+```ts
+const [persistentState, setPersistentState, clearPersistentState] = usePersistentState(initialValue)
+```
+
+With custom options
+
+```ts
+const [state, setState, clear] = usePersistentState(initialValue, {
+  storageKey: 'custom-key',
+  transformFromStorage: (value) => transformMyValue(value),
+  storageType: 'sessionStorage'
+})
+```
 
 ### [useAsync](src/useAsync)
 
@@ -73,26 +92,6 @@ export function UserComponent({userId}: {userId: number}) {
 ### [useMemoFn](src/useMemoFn)
 
 ### [useObjectState](src/useObjectState)
-
-### [usePersistentState](src/usePersistentState)
-
-Hook similar to `useState` who saves state using browser storage (localStorage or sessionStorage).
-
-Basic usage
-
-```ts
-const [persistentState, setPersistentState, clearPersistentState] = usePersistentState(initialValue)
-```
-
-With custom options
-
-```ts
-const [state, setState, clear] = usePersistentState(initialValue, {
-  storageKey: 'custom-key',
-  transformFromStorage: (value) => transformMyValue(value),
-  storageType: 'sessionStorage'
-})
-```
 
 ### [usePaginate](src/usePaginate)
 
